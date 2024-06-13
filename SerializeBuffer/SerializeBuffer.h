@@ -16,7 +16,6 @@ public:
 
 	void AllocBuffer(IN const int size = DEFAULT_SIZE)
 	{
-		int a = 1;
 		pBuffer_ = new char[size];
 		bufferSize_ = size;
 	}
