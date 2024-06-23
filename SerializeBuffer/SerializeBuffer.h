@@ -1,13 +1,18 @@
 #pragma once
 #define IN
 #define OUT
-#include  <Windows.h>
+#include <memory.h>
 class SerializeBuffer
 {
 public:
+	enum RING_SIZE
+	{
+		RINGBUFFER_SIZE = 10000
+	};
+
 	enum PACKET_SIZE
 	{
-		DEFAULT_SIZE = 28
+		DEFAULT_SIZE = RINGBUFFER_SIZE / 8
 	};
 
 	SerializeBuffer()
@@ -27,6 +32,10 @@ public:
 
 	void Resize(void)
 	{
+		if (bufferSize_ * 2 > RINGBUFFER_SIZE)
+		{
+			throw 1;
+		}
 		char* pTempBuffer = new char[bufferSize_ * 2];
 		memcpy_s(pTempBuffer, bufferSize_ * 2, pBuffer_, bufferSize_);
 		bufferSize_ *= 2;
@@ -94,87 +103,91 @@ public:
 	int front_;
 	int rear_;
 
-	SerializeBuffer& operator <<(IN const UCHAR value)
+	SerializeBuffer& operator <<(IN const unsigned char value)
 	{
 		if (bufferSize_ - rear_ < sizeof(value))
 		{
 			Resize();
 		}
-		*(UCHAR*)(pBuffer_ + rear_) = value;
+		*(unsigned char*)(pBuffer_ + rear_) = value;
 		rear_ += sizeof(value);
 		return *this;
 	}
-	SerializeBuffer& operator >>(OUT UCHAR& value)
+	SerializeBuffer& operator >>(OUT unsigned char value)
 	{
 		// value의 size만큼 읽을게 없음.
 		if (rear_ - front_ < sizeof(value))
 		{
-			return *this;
+			throw 1;
+			//return *this;
 		}
-		value = *(UCHAR*)(pBuffer_ + front_);
+		value = *(unsigned char*)(pBuffer_ + front_);
 		front_ += sizeof(value);
 		return *this;
 	}
 
-	SerializeBuffer& operator <<(IN const CHAR value)
+	SerializeBuffer& operator <<(IN const char value)
 	{
 		if (bufferSize_ - rear_ < sizeof(value))
 		{
 			Resize();
 		}
-		*(CHAR*)(pBuffer_ + rear_) = value;
+		*(char*)(pBuffer_ + rear_) = value;
 		rear_ += sizeof(value);
 		return *this;
 	}
-	SerializeBuffer& operator >>(OUT CHAR& value)
+	SerializeBuffer& operator >>(OUT char& value)
 	{
 		if (rear_ - front_ < sizeof(value))
 		{
-			return *this;
+			throw 1;
+			//return *this;
 		}
-		value = *(CHAR*)(pBuffer_ + front_);
+		value = *(char*)(pBuffer_ + front_);
 		front_ += sizeof(value);
 		return *this;
 	}
 
-	SerializeBuffer& operator <<(IN const SHORT value)
+	SerializeBuffer& operator <<(IN const short value)
 	{
 		if (bufferSize_ - rear_ < sizeof(value))
 		{
 			Resize();
 		}
-		*(SHORT*)(pBuffer_ + rear_) = value;
+		*(short*)(pBuffer_ + rear_) = value;
 		rear_ += sizeof(value);
 		return *this;
 	}
-	SerializeBuffer& operator >>(OUT SHORT& value)
+	SerializeBuffer& operator >>(OUT short& value)
 	{
 		if (rear_ - front_ < sizeof(value))
 		{
-			return *this;
+			throw 1;
+			//return *this;
 		}
-		value = *(SHORT*)(pBuffer_ + front_);
+		value = *(short*)(pBuffer_ + front_);
 		front_ += sizeof(value);
 		return *this;
 	}
 
-	SerializeBuffer& operator <<(IN const USHORT value)
+	SerializeBuffer& operator <<(IN const unsigned short value)
 	{
 		if (bufferSize_ - rear_ < sizeof(value))
 		{
 			Resize();
 		}
-		*(USHORT*)(pBuffer_ + rear_) = value;
+		*(unsigned short*)(pBuffer_ + rear_) = value;
 		rear_ += sizeof(value);
 		return *this;
 	}
-	SerializeBuffer& operator >>(OUT USHORT& value)
+	SerializeBuffer& operator >>(OUT unsigned short& value)
 	{
 		if (rear_ - front_ < sizeof(value))
 		{
-			return *this;
+			throw 1;
+			//return *this;
 		}
-		value = *(USHORT*)(pBuffer_ + front_);
+		value = *(unsigned short*)(pBuffer_ + front_);
 		front_ += sizeof(value);
 		return *this;
 	}
@@ -193,7 +206,8 @@ public:
 	{
 		if (rear_ - front_ < sizeof(value))
 		{
-			return *this;
+			throw 1;
+			//return *this;
 		}
 		value = *(int*)(pBuffer_ + front_);
 		front_ += sizeof(value);
@@ -206,7 +220,7 @@ public:
 		{
 			Resize();
 		}
-		*(DWORD*)(pBuffer_ + rear_) = value;
+		*(unsigned int*)(pBuffer_ + rear_) = value;
 		rear_ += sizeof(value);
 		return *this;
 	}
@@ -214,95 +228,100 @@ public:
 	{
 		if (rear_ - front_ < sizeof(value))
 		{
-			return *this;
+			throw 1;
+			//return *this;
 		}
-		value = *(DWORD*)(pBuffer_ + front_);
+		value = *(unsigned int*)(pBuffer_ + front_);
 		front_ += sizeof(value);
 		return *this;
 	}
 
-	SerializeBuffer& operator <<(IN const LONG value)
+	SerializeBuffer& operator <<(IN const long value)
 	{
 		if (bufferSize_ - rear_ < sizeof(value))
 		{
 			Resize();
 		}
-		*(LONG*)(pBuffer_ + rear_) = value;
+		*(long*)(pBuffer_ + rear_) = value;
 		rear_ += sizeof(value);
 		return *this;
 	}
 
-	SerializeBuffer& operator >>(OUT LONG& value)
+	SerializeBuffer& operator >>(OUT long& value)
 	{
 		if (rear_ - front_ < sizeof(value))
 		{
-			return *this;
+			throw 1;
+			//return *this;
 		}
-		value = *(LONG*)(pBuffer_ + front_);
+		value = *(long*)(pBuffer_ + front_);
 		front_ += sizeof(value);
 		return *this;
 	}
 
-	SerializeBuffer& operator <<(IN const ULONG value)
+	SerializeBuffer& operator <<(IN const unsigned long value)
 	{
 		if (bufferSize_ - rear_ < sizeof(value))
 		{
 			Resize();
 		}
-		*(ULONG*)(pBuffer_ + rear_) = value;
+		*(unsigned long*)(pBuffer_ + rear_) = value;
 		rear_ += sizeof(value);
 		return *this;
 	}
-	SerializeBuffer& operator >>(OUT ULONG& value)
+	SerializeBuffer& operator >>(OUT unsigned long& value)
 	{
 		if (rear_ - front_ < sizeof(value))
 		{
-			return *this;
+			throw 1;
+			//return *this;
 		}
-		value = *(ULONG*)(pBuffer_ + front_);
+		value = *(unsigned long*)(pBuffer_ + front_);
 		front_ += sizeof(value);
 		return *this;
 	}
 
-	SerializeBuffer& operator <<(IN const LONGLONG value)
+	SerializeBuffer& operator <<(IN const __int64 value)
 	{
 		if (bufferSize_ - rear_ < sizeof(value))
 		{
 			Resize();
 		}
-		*(LONGLONG*)(pBuffer_ + rear_) = value;
+		*(__int64*)(pBuffer_ + rear_) = value;
 		rear_ += sizeof(value);
 		return *this;
 	}
 
-	SerializeBuffer& operator >>(OUT LONGLONG& value)
+	SerializeBuffer& operator >>(OUT __int64& value)
 	{
 		if (rear_ - front_ < sizeof(value))
 		{
-			return *this;
+			throw 1;
+			//return *this;
 		}
-		value = *(LONGLONG*)(pBuffer_ + front_);
+		value = *(__int64*)(pBuffer_ + front_);
 		front_ += sizeof(value);
 		return *this;
 	}
 	//
-	SerializeBuffer& operator <<(IN const ULONGLONG value)
+	SerializeBuffer& operator <<(IN const unsigned __int64 value)
 	{
 		if (bufferSize_ - rear_ < sizeof(value))
 		{
 			Resize();
 		}
-		*(ULONGLONG*)(pBuffer_ + rear_) = value;
+		*(unsigned __int64*)(pBuffer_ + rear_) = value;
 		rear_ += sizeof(value);
 		return *this;
 	}
-	SerializeBuffer& operator >>(OUT ULONGLONG& value)
+	SerializeBuffer& operator >>(OUT unsigned __int64& value)
 	{
 		if (rear_ - front_ < sizeof(value))
 		{
-			return *this;
+			throw 1;
+			//return *this;
 		}
-		value = *(ULONGLONG*)(pBuffer_ + front_);
+		value = *(unsigned __int64*)(pBuffer_ + front_);
 		front_ += sizeof(value);
 		return *this;
 	}
@@ -321,7 +340,8 @@ public:
 	{
 		if (rear_ - front_ < sizeof(value))
 		{
-			return *this;
+			throw 1;
+			//return *this;
 		}
 		value = *(float*)(pBuffer_ + front_);
 		front_ += sizeof(value);
@@ -343,11 +363,11 @@ public:
 	{
 		if (rear_ - front_ < sizeof(value))
 		{
-			return *this;
+			throw 1;
+			//return *this;
 		}
 		value = *(double*)(pBuffer_ + front_);
 		front_ += sizeof(value);
 		return *this;
 	}
 };
-
